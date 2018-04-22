@@ -17,7 +17,8 @@ namespace ConvertDWGtoPDFwrapper
             DateTime oldDate = currDate.AddMinutes(timemask);
 
             string path = @"c:\test";
-            if(!Directory.Exists(path))
+            string argum = "";
+            if (!Directory.Exists(path))
             {
                 Console.Write("Directory not exist.");
                 return;
@@ -55,7 +56,8 @@ namespace ConvertDWGtoPDFwrapper
 
                             if(convert)
                             {
-                                ;
+                                argum = @"/r /resource .\searchres.ini /e /ls /ad /i /a -2 /layer /f 104  /layerop C:\Program Files(x86)\Acme CAD Converter\layers.ini";
+                                Console.Write(argum);
                             }
 
                         }
