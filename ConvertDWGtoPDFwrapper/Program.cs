@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
+using System.Net.Mail;
 
 namespace ConvertDWGtoPDFwrapper
 {
@@ -12,7 +13,21 @@ namespace ConvertDWGtoPDFwrapper
     {
         static void Main(string[] args)
         {
+            string to = "asobolev@tdfkm.ru";
+            string from = "fs1@tdfkm.ru";
+            string server = "s1.kifato.net";
+
+            MailMessage message = new MailMessage(from, to);
+            message.BodyEncoding = Encoding.UTF8;
+
+            message.Subject = "Convert_DWG_to_PDF";
+            message.Body = Convert.ToString(DateTime.Now) + "\n";
+            
+
+            SmtpClient client = new SmtpClient(server);
+                      
             int timemask = 0;
+            int count = 0;
             DateTime currDate = DateTime.Now;
             FileInfo _file = null;
             FileInfo _tmpfile = null;
@@ -35,7 +50,7 @@ namespace ConvertDWGtoPDFwrapper
 
             if (!Directory.Exists(path))
             {
-                Console.WriteLine("Directory not exist.");
+                message.Body += "Directory not exist.\n";
                 return;
             }
 
@@ -43,7 +58,7 @@ namespace ConvertDWGtoPDFwrapper
             {
                 bool convert = false;
                 List<string> files = Directory.EnumerateFiles(@"c:\test", "*.dwg*", SearchOption.AllDirectories).ToList<string>();
-                Console.WriteLine("Searching files...");
+                message.Body += "Searching files...\n\n";
                 foreach (string currentFile in files)
                 {
                     convert = false;
@@ -55,23 +70,23 @@ namespace ConvertDWGtoPDFwrapper
                         Console.WriteLine("Touch file..." + _file.FullName);
                         if (_file.LastWriteTime < oldDate)
                         {
+                            
                             Console.WriteLine("Found new file: " + _file.FullName);
 
                             thisDir = new DirectoryInfo(_file.DirectoryName);
                             thisDir = thisDir.CreateSubdirectory("pdf");
                             _outfile = new FileInfo(Path.ChangeExtension(thisDir.FullName + "\\" +_file.Name, ".pdf"));
-
+               
                             Console.WriteLine("Check if PDF exist: " + _outfile.FullName);
-                            if (_outfile.Exists)
+                            if (_outfile.Exists && _outfile.Length != 0)
                             {
                                 Console.WriteLine("PDF exist. Return: " + _outfile.FullName);
-                                if (_outfile.Length != 0)
-                                    continue;
-                                convert = true;
+                                continue;
                             }
                             else
                                 convert = true;
 
+                                                       
                             if(convert)
                             {
                                 Console.WriteLine("Trying converting to " + _outfile.FullName);
@@ -98,10 +113,14 @@ namespace ConvertDWGtoPDFwrapper
                                     _outfile.Refresh();
                                     if (_outfile.Exists && _outfile.Length != 0)
                                     {
+                                        message.Body += count + ". " + _outfile.FullName + " ";
+                                        message.Body += _outfile.Length + "\n";
                                         Console.WriteLine("DWG converted: " + _outfile.FullName + " size: " + _outfile.Length);
                                     }
                                     else
                                         Console.WriteLine("DWG not converted: " + _outfile.FullName);
+
+                                    count++;
                                 }
                                 catch (Exception e)
                                 {
@@ -111,6 +130,8 @@ namespace ConvertDWGtoPDFwrapper
                                 
                                // Console.WriteLine(startInfo.Arguments);
                             }
+
+                           
 
                         }
                         
@@ -127,7 +148,19 @@ namespace ConvertDWGtoPDFwrapper
             {
                 Console.WriteLine(e.Message);
             }
-            
+            currDate = DateTime.Now;
+            message.Body += "\n" + currDate;
+
+            if (count == 0)
+                return;
+            try
+            {
+                client.Send(message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception caught in CreateTestMessage2(): {0}", ex.ToString());
+            }
 
             Console.ReadKey();
 
