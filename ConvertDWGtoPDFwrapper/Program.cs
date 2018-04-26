@@ -13,9 +13,17 @@ namespace ConvertDWGtoPDFwrapper
     {
         static void Main(string[] args)
         {
+            if (args?.Count() == 0 || string.IsNullOrWhiteSpace(args[0]))
+            {
+                Console.WriteLine("Не задано имя каталога.");
+                return;
+            }
+            string path = args[0];
+
             string to = "asobolev@tdfkm.ru";
             string from = "fs1@tdfkm.ru";
             string server = "s1.kifato.net";
+            bool completed = false;
 
             MailMessage message = new MailMessage(from, to);
             message.BodyEncoding = Encoding.UTF8;
@@ -36,8 +44,7 @@ namespace ConvertDWGtoPDFwrapper
             DirectoryInfo thisDir = null;
             DateTime oldDate = currDate.AddMinutes(timemask);
 
-            string path = @"c:\test";
-         
+                  
             Process converter = new Process();
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
@@ -106,8 +113,13 @@ namespace ConvertDWGtoPDFwrapper
                                     string output = converter.StandardError.ReadToEnd();
                                     Console.WriteLine(startInfo.Arguments);
                                     Console.WriteLine(output);
-                                    converter.WaitForExit(300000);
+                                    completed = converter.WaitForExit(300000);
+                                    if(!completed)
+                                    {
+                                        message.Body += count + ". " + _outfile.FullName + "convrter not responding";
 
+                                        continue;
+                                    }
                                     _tmpfile = new FileInfo(Path.ChangeExtension(_file.FullName, ".pdf"));
                                     File.Move(_tmpfile.FullName, _outfile.FullName);
                                     _outfile.Refresh();
@@ -162,7 +174,7 @@ namespace ConvertDWGtoPDFwrapper
                 Console.WriteLine("Exception caught in CreateTestMessage2(): {0}", ex.ToString());
             }
 
-            Console.ReadKey();
+      //      Console.ReadKey();
 
         }
 
