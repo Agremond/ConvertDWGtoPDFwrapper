@@ -34,7 +34,7 @@ namespace ConvertDWGtoPDFwrapper
 
             SmtpClient client = new SmtpClient(server);
                       
-            int timemask = 0;
+            int timemask = -65;
             int count = 0;
             DateTime currDate = DateTime.Now;
             FileInfo _file = null;
@@ -51,9 +51,6 @@ namespace ConvertDWGtoPDFwrapper
 
 
             startInfo.FileName = @"C:\Program Files (x86)\Acme CAD Converter\aconv.exe";
-
-            
-            
 
             if (!Directory.Exists(path))
             {
@@ -75,7 +72,7 @@ namespace ConvertDWGtoPDFwrapper
                         _file = new FileInfo(currentFile);
 
                         Console.WriteLine("Touch file..." + _file.FullName);
-                        if (_file.LastWriteTime < oldDate)
+                        if (_file.LastWriteTime > oldDate)
                         {
                             
                             Console.WriteLine("Found new file: " + _file.FullName);
