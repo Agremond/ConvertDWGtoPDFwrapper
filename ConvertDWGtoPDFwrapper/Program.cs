@@ -13,12 +13,7 @@ namespace ConvertDWGtoPDFwrapper
     {
         static void Main(string[] args)
         {
-            if (args?.Count() == 0 || string.IsNullOrWhiteSpace(args[0]))
-            {
-                Console.WriteLine("Не задано имя каталога.");
-                return;
-            }
-            string path = args[0];
+           
 
             string to = "asobolev@tdfkm.ru";
             string from = "fs1@tdfkm.ru";
@@ -30,7 +25,6 @@ namespace ConvertDWGtoPDFwrapper
 
             message.Subject = "Convert_DWG_to_PDF";
             message.Body = Convert.ToString(DateTime.Now) + "\n";
-            
 
             SmtpClient client = new SmtpClient(server);
                       
@@ -43,26 +37,35 @@ namespace ConvertDWGtoPDFwrapper
             
             DirectoryInfo thisDir = null;
             DateTime oldDate = currDate.AddMinutes(timemask);
-
-                  
+    
             Process converter = new Process();
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
 
+
+            if (args?.Count() == 0 || string.IsNullOrWhiteSpace(args[0]))
+            {
+                message.Body += "Не задано имя каталога.\n";
+                client.Send(message);
+                return;
+            }
+            string path = args[0];
 
             startInfo.FileName = @"C:\Program Files (x86)\Acme CAD Converter\aconv.exe";
 
             if (!Directory.Exists(path))
             {
                 message.Body += "Directory not exist.\n";
+                client.Send(message);
                 return;
             }
 
             try
             {
                 bool convert = false;
-                List<string> files = Directory.EnumerateFiles(@"c:\test", "*.dwg*", SearchOption.AllDirectories).ToList<string>();
-                message.Body += "Searching files...\n\n";
+                List<string> files = Directory.EnumerateFiles(path, "*.dwg*", SearchOption.AllDirectories).ToList<string>();
+                message.Body += "Searching files...\n";
+    //            message.Body += "Найдено файлов: " + files.Count + "\n\n";
                 foreach (string currentFile in files)
                 {
                     convert = false;
@@ -139,15 +142,12 @@ namespace ConvertDWGtoPDFwrapper
                                 
                                // Console.WriteLine(startInfo.Arguments);
                             }
-
-                           
-
                         }
                         
                     }
                     catch (IOException)
                     {
-                        Console.Write("Can not access to file" + currentFile);
+                        message.Body += "Can not access to file" + currentFile + "\n";
                     }
 
                   
@@ -157,11 +157,18 @@ namespace ConvertDWGtoPDFwrapper
             {
                 Console.WriteLine(e.Message);
             }
+
+            if (count == 0)
+            {
+            //    message.Body += "Файлы для пережатия не найдены\n";
+                return;
+            }
+
             currDate = DateTime.Now;
             message.Body += "\n" + currDate;
 
-            if (count == 0)
-                return;
+           
+                
             try
             {
                 client.Send(message);
