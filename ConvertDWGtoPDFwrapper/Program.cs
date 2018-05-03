@@ -15,7 +15,7 @@ namespace ConvertDWGtoPDFwrapper
         {
            
 
-            string to = "asobolev@tdfkm.ru";
+            string to = "sysadm@tdfkm.ru";
             string from = "fs1@tdfkm.ru";
             string server = "s1.kifato.net";
             bool completed = false;
@@ -28,7 +28,7 @@ namespace ConvertDWGtoPDFwrapper
 
             SmtpClient client = new SmtpClient(server);
                       
-            int timemask = -65;
+            int timemask = -125;
             int count = 0;
             DateTime currDate = DateTime.Now;
             FileInfo _file = null;
@@ -65,7 +65,8 @@ namespace ConvertDWGtoPDFwrapper
                 bool convert = false;
                 List<string> files = Directory.EnumerateFiles(path, "*.dwg*", SearchOption.AllDirectories).ToList<string>();
                 message.Body += "Searching files...\n";
-    //            message.Body += "Найдено файлов: " + files.Count + "\n\n";
+                message.Body = Convert.ToString(DateTime.Now) + "\n";
+                //            message.Body += "Найдено файлов: " + files.Count + "\n\n";
                 foreach (string currentFile in files)
                 {
                     convert = false;
