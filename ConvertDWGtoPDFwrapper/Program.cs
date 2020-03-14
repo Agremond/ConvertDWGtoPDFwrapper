@@ -15,9 +15,9 @@ namespace ConvertDWGtoPDFwrapper
         {
            
 
-            string to = "sysadm@tdfkm.ru";
-            string from = "fs1@tdfkm.ru";
-            string server = "s1.kifato.net";
+            string to = "sysadm@";
+            string from = "fs1@";
+            string server = "s1";
             bool completed = false;
 
             MailMessage message = new MailMessage(from, to);
